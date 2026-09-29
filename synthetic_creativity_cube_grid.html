@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synthetic Creativity Cube</title>
+<style>
+:root {
+  --bg:#f4f5f7; --panel:#ffffff; --ink:#111318; --muted:#69707d; --line:#d6d9df;
+  --accent:#4f46e5; --accent-soft:#eef2ff; --dark:#111827; --dark2:#374151;
+  --gold:#d4a72c; --surface:#f8fafc;
+  --cube-a:#2563eb; --cube-b:#7c3aed; --cube-c:#db2777; --cube-d:#059669; --cube-e:#d97706; --cube-f:#0891b2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:1700px;margin:0 auto;padding:28px}
+
+.mode-switch{display:inline-flex;gap:4px;padding:4px;background:#e7e9ee;border-radius:12px;margin:0 0 18px}
+.mode-switch button{background:transparent;color:var(--ink);padding:9px 14px;border-radius:9px}
+.mode-switch button.active{background:var(--dark);color:#fff}
+.mode-section[hidden]{display:none!important}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,.65fr);gap:18px;align-items:start}
+h1{margin:0 0 8px;font-size:clamp(34px,5vw,62px);letter-spacing:-.045em;line-height:.98}
+.lede{max-width:980px;margin:0 0 18px;color:var(--muted);font-size:17px;line-height:1.55}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.cube-panel{padding:10px}
+canvas{display:block;width:100%;height:auto;aspect-ratio:1.35/1;background:radial-gradient(circle at 50% 42%,#fff 0,#fafbfc 55%,#eef0f4 100%);border-radius:12px;touch-action:none;cursor:grab}
+canvas.dragging{cursor:grabbing}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:8px 4px 2px}
+button{border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:750;cursor:pointer;background:var(--dark);color:#fff}
+button.secondary{background:#e7e9ee;color:var(--ink)}
+button.accent{background:var(--accent)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid rgba(79,70,229,.3);outline-offset:2px}
+.control-block{margin:14px 0}
+.control-block label{display:flex;justify-content:space-between;gap:12px;font-weight:750;margin-bottom:7px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.help{font-size:13px;color:var(--muted);line-height:1.5}
+.result-card{min-height:180px;border-left:4px solid var(--accent);background:#f8f9fb;border-radius:10px;padding:14px}
+.result-card .kicker{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.result-card h2{font-size:22px;margin:5px 0 8px;line-height:1.15}
+.result-card p{margin:0;line-height:1.55}
+.depth-tag{display:inline-block;margin-top:10px;padding:5px 8px;border-radius:999px;background:var(--accent-soft);color:#3730a3;font-size:12px;font-weight:800}
+.editor{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(0,1.2fr);gap:16px;margin:20px 0}
+textarea{width:100%;min-height:170px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;line-height:1.4}
+label.block{display:block;font-weight:800;margin-bottom:8px}
+.meta{font-size:13px;color:var(--muted);margin-top:8px}
+.explainer h2{margin:0 0 8px;font-size:21px}
+.explainer p{margin:0 0 9px;line-height:1.55;color:#353943}
+.matrix-heading{display:flex;justify-content:space-between;gap:18px;align-items:end;flex-wrap:wrap;margin:26px 0 10px}
+.matrix-heading h2{margin:0;font-size:26px}
+.matrix-wrap{overflow:auto;max-height:72vh;border:1px solid var(--line);border-radius:14px;background:white}
+table{border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:7600px}
+th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+th{background:#111827;color:white;font-size:12px;line-height:1.15;padding:8px;text-align:center;width:150px;min-width:150px;height:96px;vertical-align:middle}
+th.corner{position:sticky;left:0;top:0;z-index:5;background:#000;width:180px;min-width:180px}
+th.colhead{position:sticky;top:0;z-index:4}
+th.rowhead{position:sticky;left:0;z-index:3;background:#374151;width:180px;min-width:180px;text-align:left;height:88px}
+td{width:150px;min-width:150px;height:88px;padding:8px;font-size:12px;line-height:1.25;vertical-align:top;background:white;cursor:pointer}
+@media(hover:hover) and (pointer:fine){td:hover{background:#eef2ff;outline:2px solid var(--accent);outline-offset:-2px}}
+td.diag{background:#fff7d6;font-weight:700}
+.reading{margin-top:34px;padding:22px;background:white;border:1px solid var(--line);border-radius:16px}
+.reading h2{margin:0 0 6px;font-size:28px}
+.reading .intro{color:var(--muted);line-height:1.5;margin:0 0 14px}
+.reading ol{margin:0;padding-left:22px}
+.reading li{margin:0 0 14px;padding-left:5px;line-height:1.45}
+.reading a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:3px}
+.reading li span{display:block;color:var(--muted);font-size:14px;margin-top:3px}
+.footer-note{font-size:12px;color:var(--muted);margin-top:12px}
+
+
+.rotation-speed{display:grid;grid-template-columns:minmax(170px,260px) minmax(180px,1fr);gap:12px;align-items:center;padding:6px 4px 2px}
+.rotation-speed label{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:800;color:var(--ink)}
+.rotation-speed input{width:100%;accent-color:var(--accent)}
+@media(max-width:700px){.rotation-speed{grid-template-columns:1fr}}
+
+.z-slice-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.z-slice-controls select{min-width:240px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:white}
+.z-label{font-weight:800;color:var(--ink)}
+.z-slice-summary{margin-bottom:10px}
+.z-slice-summary .kicker{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.z-slice-name{font-size:24px;font-weight:850;margin-top:2px}
+
+@media(max-width:980px){.hero,.editor{grid-template-columns:1fr}.app{padding:15px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <h1>Synthetic Creativity Cube</h1>
+    <p class="lede">
+      Explore combinational creativity in two forms: a three-dimensional A × B × C cube and the original two-dimensional A × B matrix. The page opens in cube mode; switch views at any time without changing the subject list.
+    </p>
+  </header>
+
+  <div class="mode-switch" role="group" aria-label="Visualization mode">
+    <button type="button" id="mode3D" class="active" aria-pressed="true">3D Cube</button>
+    <button type="button" id="mode2D" aria-pressed="false">2D Matrix</button>
+  </div>
+
+  <div id="mode3DSection" class="mode-section">
+  <section class="hero">
+    <div class="panel cube-panel">
+      <canvas id="cube" width="1100" height="820" aria-label="Interactive fractal cube. Drag to rotate, scroll to zoom, and click a face or internal cube to select a disciplinary combination."></canvas>
+      <div class="toolbar">
+        <button type="button" id="resetView">Reset view</button>
+        <button type="button" class="secondary" id="randomPoint">Random point</button>
+        <button type="button" class="secondary" id="toggleSpin">Pause rotation</button>
+        <button type="button" class="secondary" id="toggleCounterRotation">Counter-rotation: Off</button>
+      </div>
+      <div class="rotation-speed">
+        <label for="spinSpeed"><span>Rotation speed</span><span id="spinSpeedLabel">Slow</span></label>
+        <input id="spinSpeed" type="range" min="0" max="100" step="1" value="28">
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="result-card" id="result" aria-live="polite">
+        <div class="kicker">Selected intersection</div>
+        <h2>Click the cube</h2>
+        <p>Click a visible face to generate a three-way disciplinary synthesis. Increase the cutaway depth to expose nested interior cubes and deeper third-discipline coordinates.</p>
+      </div>
+
+      <div class="control-block">
+        <label for="depth"><span>Cutaway depth</span><span id="depthLabel">Surface</span></label>
+        <input id="depth" type="range" min="0" max="4" step="1" value="0">
+        <div class="help">Surface shows the exterior. Higher values make the shell increasingly transparent and reveal selectable nested cubes.</div>
+      </div>
+
+      <div class="control-block">
+        <label for="density"><span>Fractal pattern density</span><span id="densityLabel">3</span></label>
+        <input id="density" type="range" min="2" max="6" step="1" value="3">
+      </div>
+
+      <div class="help">
+        <strong>Mouse:</strong> drag to rotate · wheel to zoom · click to select.<br>
+        <strong>Trackpad:</strong> click-drag to rotate · two-finger scroll to zoom.<br>
+        The clicked position is translated into three disciplinary coordinates: two from the visible face and one from depth.
+      </div>
+    </aside>
+  </section>
+
+  <section class="editor">
+    <div class="panel">
+      <label class="block" for="subjects">Subjects — one per line</label>
+      <textarea id="subjects"></textarea>
+      <div class="toolbar">
+        <button type="button" class="accent" id="buildBtn">Build Matrix</button>
+        <button type="button" class="secondary" id="defaultsBtn">Reset Defaults</button>
+      </div>
+      <div class="meta" id="count"></div>
+    </div>
+
+    <div class="panel explainer">
+      <h2>How the cube relates to the matrix</h2>
+      <p>The matrix below is now a true three-dimensional browser presented as stacked Z slices. X runs across the top, Y down the left, and each selected Z discipline defines an entire 50×50 layer.</p>
+      <p>The cube and the matrix now use the same A × B × C logic. Moving between Z slices is equivalent to moving through the cube's depth, while clicking a cell selects a specific three-discipline point.</p>
+      <p>The fractal pattern is intentionally recursive: a combination is not an endpoint, but a new conceptual space that can itself be recombined.</p>
+    </div>
+  </section>
+
+  <div class="matrix-heading">
+    <div>
+      <h2>50 × 50 × 50 Synthetic Creativity Matrix</h2>
+      <div class="meta">Browse the cube as a stack of 50 two-dimensional Z slices. X runs across the top, Y down the left, and the selected Z discipline shapes every cell.</div>
+    </div>
+    <div class="z-slice-controls">
+      <button type="button" class="secondary" id="prevZ">← Previous Z</button>
+      <label for="zSliceSelect" class="z-label">Z slice</label>
+      <select id="zSliceSelect" aria-label="Select Z discipline"></select>
+      <button type="button" class="secondary" id="nextZ">Next Z →</button>
+    </div>
+  </div>
+
+  <div class="z-slice-summary panel">
+    <div class="kicker">Current Z slice</div>
+    <div class="z-slice-name" id="zSliceName"></div>
+    <div class="meta">Each cell below is a three-way combination: <strong>X × Y × Z</strong>.</div>
+  </div>
+
+  <div class="matrix-wrap">
+    <table id="matrix"></table>
+  </div>
+  </div>
+
+  <div id="mode2DSection" class="mode-section" hidden>
+    <div class="matrix-heading">
+      <div>
+        <h2>50 × 50 Synthetic Creativity Matrix</h2>
+        <div class="meta">The original pairwise matrix: A × B. X runs across the top and Y down the left.</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:10px">
+      <div class="result-card" id="result2D" aria-live="polite">
+        <div class="kicker">Selected intersection</div>
+        <h2>Click a matrix cell</h2>
+        <p>Select any pair of disciplines to view the original two-way synthetic creativity prompt.</p>
+      </div>
+    </div>
+
+    <div class="matrix-wrap">
+      <table id="matrix2D"></table>
+    </div>
+  </div>
+
+  <section class="reading">
+    <h2>Further Reading</h2>
+    <p class="intro">A short genealogy of ideas behind combinational, synthetic, morphological, and interdisciplinary creativity.</p>
+    <ol>
+      <li><a href="https://search.worldcat.org/title/The-act-of-creation/oclc/898869664" target="_blank" rel="noopener"><strong>Arthur Koestler</strong>, <em>The Act of Creation</em> (1964)</a><span>Bisociation: creative thought emerges when previously separate matrices of thought are brought into contact.</span></li>
+<li><a href="https://books.google.com/books/about/Discovery_Invention_Research_Through_the.html?id=cdRfAAAAMAAJ" target="_blank" rel="noopener"><strong>Fritz Zwicky</strong>, <em>Discovery, Invention, Research Through the Morphological Approach</em> (1969)</a><span>Morphological analysis: systematically enumerate a possibility space rather than relying only on familiar combinations.</span></li>
+<li><a href="https://mitpress.mit.edu/9780262061506/creative-cognition/" target="_blank" rel="noopener"><strong>Ronald A. Finke, Thomas B. Ward & Steven M. Smith</strong>, <em>Creative Cognition: Theory, Research, and Applications</em> (1992)</a><span>Creative cognition and conceptual synthesis as ordinary cognitive processes that can generate novel inventions and ideas.</span></li>
+<li><a href="https://www.routledge.com/The-Creative-Mind-Myths-and-Mechanisms/Boden/p/book/9780415314534" target="_blank" rel="noopener"><strong>Margaret A. Boden</strong>, <em>The Creative Mind: Myths and Mechanisms</em> (1990; 2nd ed. 2004)</a><span>Combinational creativity and the exploration or transformation of conceptual spaces.</span></li>
+<li><a href="https://books.google.com/books?id=frmnBiHJ0o4C" target="_blank" rel="noopener"><strong>Gilles Fauconnier & Mark Turner</strong>, <em>The Way We Think: Conceptual Blending and the Mind’s Hidden Complexities</em> (2002)</a><span>Conceptual blending: input spaces can be selectively combined into an emergent space with properties not present in either input alone.</span></li>
+<li><a href="https://journals.sagepub.com/doi/10.1177/0725513608099121" target="_blank" rel="noopener"><strong>Diana Rhoten, Erin O’Connor & Edward J. Hackett</strong>, <em>“The Act of Collaborative Creation and the Art of Integrative Creativity”</em> (2009)</a><span>An empirical study of originality, bisociation, disciplinarity, and interdisciplinary integration in collaborative scientific work.</span></li>
+    </ol>
+    <div class="footer-note">Links point to publisher, library, or scholarly records for the cited works.</div>
+  </section>
+</main>
+
+<script>
+(() => {
+const DEFAULT_SUBJECTS = ["Anthropology", "Archaeology", "Architecture", "Art History", "Astronomy", "Biology", "Chemistry", "Classics", "Cognitive Science", "Communication", "Computer Science", "Criminology", "Cultural Studies", "Economics", "Education", "Engineering", "Environmental Science", "Ethics", "Film Studies", "Geography", "Geology", "History", "Law", "Linguistics", "Literature", "Mathematics", "Media Studies", "Medicine", "Music", "Neuroscience", "Philosophy", "Physics", "Political Science", "Psychology", "Public Health", "Religious Studies", "Robotics", "Sociology", "Statistics", "Theater", "Urban Studies", "Gender Studies", "Data Science", "Design", "Ecology", "Food Studies", "Game Studies", "Information Science", "Science & Technology Studies", "Translation Studies"];
+const canvas = document.getElementById('cube');
+const ctx = canvas.getContext('2d');
+const textarea = document.getElementById('subjects');
+const matrix = document.getElementById('matrix');
+const matrix2D = document.getElementById('matrix2D');
+const result2D = document.getElementById('result2D');
+const mode3D = document.getElementById('mode3D');
+const mode2D = document.getElementById('mode2D');
+const mode3DSection = document.getElementById('mode3DSection');
+const mode2DSection = document.getElementById('mode2DSection');
+const count = document.getElementById('count');
+const result = document.getElementById('result');
+const zSliceSelect = document.getElementById('zSliceSelect');
+const zSliceName = document.getElementById('zSliceName');
+const depthSlider = document.getElementById('depth');
+const densitySlider = document.getElementById('density');
+const depthLabel = document.getElementById('depthLabel');
+const densityLabel = document.getElementById('densityLabel');
+const spinSpeed = document.getElementById('spinSpeed');
+const spinSpeedLabel = document.getElementById('spinSpeedLabel');
+
+let subjects = DEFAULT_SUBJECTS.slice();
+let rotX = -0.62, rotY = 0.78, rotZ = 0.0, zoom = 0.78;
+let spinPhase = 0.0;
+let counterRotate = false;
+let dragging = false, moved = false, lastX = 0, lastY = 0;
+let hitRegions = [];
+let spin = true, raf = null;
+
+function normalizeSubjects(text) {
+  const seen = new Set();
+  return text.split(/\n+/).map(s=>s.trim()).filter(Boolean).filter(s=>{
+    const k=s.toLowerCase();
+    if(seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+}
+
+function promptFor(a,b,r,c) {
+  if(a===b) return `Core inquiry within ${a}`;
+  const templates = [
+    `Use ${a} methods to investigate ${b} problems`,
+    `Reinterpret ${b} through ${a} concepts`,
+    `Design a project joining ${a} and ${b}`,
+    `Study how ${a} reshapes questions in ${b}`,
+    `Build a synthetic field: ${a} × ${b}`
+  ];
+  return templates[(r+c)%templates.length];
+}
+
+function triadPrompt(a,b,c) {
+  if(a===b && b===c) {
+    return `Deepen a core inquiry within ${a} by forcing it through three distinct roles: method, domain, and context.`;
+  }
+  const templates = [
+    `Use methods from ${a} to investigate problems in ${b}, while ${c} supplies the constraint or third perspective that changes the question.`,
+    `Reinterpret ${b} through concepts from ${a}, then ask how ${c} destabilizes, extends, or redirects the resulting synthesis.`,
+    `Design a project in which ${a} provides the method, ${b} provides the domain, and ${c} provides the context, audience, or ethical complication.`,
+    `Invent a synthetic field at the intersection of ${a}, ${b}, and ${c}. What objects, methods, and questions would exist only in this three-way combination?`,
+    `Find an emergent problem that none of ${a}, ${b}, or ${c} would naturally formulate alone.`
+  ];
+  const ai = Math.max(0, subjects.indexOf(a));
+  const bi = Math.max(0, subjects.indexOf(b));
+  const ci = Math.max(0, subjects.indexOf(c));
+  return templates[(ai*7 + bi*11 + ci*13) % templates.length];
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+}
+
+function buildMatrix() {
+  const currentZ = Math.max(0, Math.min(subjects.length-1, Number(zSliceSelect.value)||0));
+
+  // Keep Z selector synchronized with the subject list.
+  zSliceSelect.innerHTML='';
+  subjects.forEach((s,i)=>{
+    const o=document.createElement('option');
+    o.value=String(i);
+    o.textContent=s;
+    zSliceSelect.appendChild(o);
+  });
+  zSliceSelect.value=String(currentZ);
+  zSliceName.textContent=subjects[currentZ];
+
+  matrix.innerHTML='';
+  const thead=document.createElement('thead');
+  const hr=document.createElement('tr');
+  const corner=document.createElement('th');
+  corner.className='corner';
+  corner.textContent='Y ↓ / X →';
+  hr.appendChild(corner);
+
+  subjects.forEach(s=>{
+    const th=document.createElement('th');
+    th.className='colhead';
+    th.textContent=s;
+    hr.appendChild(th);
+  });
+  thead.appendChild(hr);
+  matrix.appendChild(thead);
+
+  const tbody=document.createElement('tbody');
+  subjects.forEach((rowSubject,r)=>{
+    const tr=document.createElement('tr');
+    const rh=document.createElement('th');
+    rh.className='rowhead';
+    rh.textContent=rowSubject;
+    tr.appendChild(rh);
+
+    subjects.forEach((colSubject,c)=>{
+      const td=document.createElement('td');
+      const zSubject=subjects[currentZ];
+      td.textContent=triadPrompt(colSubject,rowSubject,zSubject);
+      if(r===c && c===currentZ) td.classList.add('diag');
+      td.addEventListener('click',()=>showSelection(c,r,currentZ,'Matrix Z slice'));
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  matrix.appendChild(tbody);
+
+  count.textContent=`${subjects.length} subjects → ${Math.pow(subjects.length,3).toLocaleString()} ordered A × B × C combinations`;
+}
+
+function buildMatrix2D() {
+  matrix2D.innerHTML='';
+
+  const thead=document.createElement('thead');
+  const hr=document.createElement('tr');
+  const corner=document.createElement('th');
+  corner.className='corner';
+  corner.textContent='SUBJECT ↓ / SUBJECT →';
+  hr.appendChild(corner);
+
+  subjects.forEach(s=>{
+    const th=document.createElement('th');
+    th.className='colhead';
+    th.textContent=s;
+    hr.appendChild(th);
+  });
+
+  thead.appendChild(hr);
+  matrix2D.appendChild(thead);
+
+  const tbody=document.createElement('tbody');
+  subjects.forEach((rowSubject,r)=>{
+    const tr=document.createElement('tr');
+
+    const rh=document.createElement('th');
+    rh.className='rowhead';
+    rh.textContent=rowSubject;
+    tr.appendChild(rh);
+
+    subjects.forEach((colSubject,c)=>{
+      const td=document.createElement('td');
+      const desc=promptFor(rowSubject,colSubject,r,c);
+      td.textContent=desc;
+      if(r===c) td.classList.add('diag');
+
+      td.addEventListener('click',()=>{
+        result2D.innerHTML=`
+          <div class="kicker">2D matrix selection</div>
+          <h2>${escapeHTML(rowSubject)} × ${escapeHTML(colSubject)}</h2>
+          <p>${escapeHTML(desc)}</p>`;
+      });
+
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  matrix2D.appendChild(tbody);
+}
+
+
+function showSelection(r,c,depthIndex,source='Cube') {
+  r=Math.max(0,Math.min(subjects.length-1,r));
+  c=Math.max(0,Math.min(subjects.length-1,c));
+  const d=Math.max(0,Math.min(subjects.length-1,depthIndex));
+
+  const a=subjects[r];
+  const b=subjects[c];
+  const z=subjects[d];
+  const desc=triadPrompt(a,b,z);
+
+  result.innerHTML=`
+    <div class="kicker">${escapeHTML(source)} selection</div>
+    <h2>${escapeHTML(a)} × ${escapeHTML(b)} × ${escapeHTML(z)}</h2>
+    <p>${escapeHTML(desc)}</p>`;
+}
+
+function matRotate(p, extraY=0, extraX=0, extraZ=0) {
+  let [x,y,z]=p;
+  const rx = rotX + extraX;
+  const ry = rotY + extraY;
+  const rz = rotZ + extraZ;
+
+  let cx=Math.cos(rx), sx=Math.sin(rx);
+  let cy=Math.cos(ry), sy=Math.sin(ry);
+  let cz=Math.cos(rz), sz=Math.sin(rz);
+
+  let y1=y*cx-z*sx, z1=y*sx+z*cx; y=y1; z=z1;
+  let x1=x*cy+z*sy, z2=-x*sy+z*cy; x=x1; z=z2;
+  let x2=x*cz-y*sz, y2=x*sz+y*cz; x=x2; y=y2;
+  return [x,y,z];
+}
+
+function layerSpinAngles(layer) {
+  if(layer===0 || !counterRotate) return {extraY:0, extraX:0, extraZ:0};
+  const sign = (layer % 2 === 1) ? -1 : 1;   // alternate directions by depth
+  const mag = 1 + layer * 0.18;              // slightly stronger deeper in
+  return {
+    extraY: sign * spinPhase * mag,
+    extraX: sign * spinPhase * 0.18 * mag,
+    extraZ: sign * spinPhase * 0.10 * mag
+  };
+}
+
+function project(p, layer=0) {
+  const ang = layerSpinAngles(layer);
+  const q=matRotate(p, ang.extraY, ang.extraX, ang.extraZ);
+  const dist=4.8;
+  const k=(dist/(dist-q[2]))*zoom;
+  return {x:canvas.width/2+q[0]*270*k,y:canvas.height/2-q[1]*270*k,z:q[2],k};
+}
+
+function polyPath(poly) {
+  ctx.beginPath(); ctx.moveTo(poly[0].x,poly[0].y);
+  for(let i=1;i<poly.length;i++) ctx.lineTo(poly[i].x,poly[i].y);
+  ctx.closePath();
+}
+
+function pointInPoly(x,y,poly) {
+  let inside=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++) {
+    const xi=poly[i].x, yi=poly[i].y, xj=poly[j].x, yj=poly[j].y;
+    const intersect=((yi>y)!=(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi+1e-9)+xi);
+    if(intersect) inside=!inside;
+  }
+  return inside;
+}
+
+function fractalValue(u,v,levels) {
+  let x=u, y=v, score=0;
+  for(let i=0;i<levels;i++) {
+    x*=3; y*=3;
+    const xi=Math.floor(x)%3, yi=Math.floor(y)%3;
+    if(xi===1 && yi===1) score++;
+    x-=Math.floor(x); y-=Math.floor(y);
+  }
+  return score;
+}
+
+const faces = [
+  {name:'front', verts:[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]], map:(u,v)=>[v,u]},
+  {name:'back',  verts:[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1]], map:(u,v)=>[v,1-u]},
+  {name:'right', verts:[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1]], map:(u,v)=>[v,u]},
+  {name:'left',  verts:[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1]], map:(u,v)=>[v,1-u]},
+  {name:'top',   verts:[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1]], map:(u,v)=>[1-v,u]},
+  {name:'bottom',verts:[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1]], map:(u,v)=>[v,u]}
+];
+
+function scaledVerts(face,scale) {
+  return face.verts.map(v=>v.map(n=>n*scale));
+}
+
+function bilerp(a,b,c,d,u,v) {
+  return [
+    a[0]*(1-u)*(1-v)+b[0]*u*(1-v)+c[0]*u*v+d[0]*(1-u)*v,
+    a[1]*(1-u)*(1-v)+b[1]*u*(1-v)+c[1]*u*v+d[1]*(1-u)*v,
+    a[2]*(1-u)*(1-v)+b[2]*u*(1-v)+c[2]*u*v+d[2]*(1-u)*v
+  ];
+}
+
+
+const CUBE_COLORS = [
+  [37,99,235],   // blue
+  [124,58,237],  // violet
+  [219,39,119],  // magenta
+  [5,150,105],   // emerald
+  [217,119,6],   // amber
+  [8,145,178]    // cyan
+];
+
+function cubeColor(faceIndex, layer, alpha=1) {
+  const base = CUBE_COLORS[(faceIndex + layer*2) % CUBE_COLORS.length];
+  return `rgba(${base[0]},${base[1]},${base[2]},${alpha})`;
+}
+
+function drawCubeLayer(scale,layer,alpha,patternLevels) {
+  const drawable=[];
+  faces.forEach((face,faceIndex)=>{
+    const verts=scaledVerts(face,scale);
+    const projected=verts.map(v => project(v, layer));
+    const avgz=projected.reduce((s,p)=>s+p.z,0)/4;
+    const area=(projected[1].x-projected[0].x)*(projected[3].y-projected[0].y)-(projected[1].y-projected[0].y)*(projected[3].x-projected[0].x);
+    if(area>0) return;
+    drawable.push({face,faceIndex,verts,projected,avgz});
+  });
+  drawable.sort((a,b)=>a.avgz-b.avgz);
+
+  drawable.forEach(obj=>{
+    const {face,faceIndex,verts,projected}=obj;
+
+    ctx.save();
+    polyPath(projected);
+    ctx.clip();
+
+    // Soft face tint: enough color to separate planes without overpowering text/UI.
+    ctx.fillStyle=cubeColor(faceIndex,layer,0.055 + layer*0.015);
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // Fractal mosaic cells.
+    const grid=9;
+    for(let iy=0;iy<grid;iy++) {
+      for(let ix=0;ix<grid;ix++) {
+        const u0=ix/grid,u1=(ix+1)/grid,v0=iy/grid,v1=(iy+1)/grid;
+        const midU=(u0+u1)/2, midV=(v0+v1)/2;
+        const val=fractalValue(midU,midV,patternLevels);
+        if((val+ix+iy+layer)%3===0) {
+          const cell=[
+            bilerp(...verts,u0,v0),
+            bilerp(...verts,u1,v0),
+            bilerp(...verts,u1,v1),
+            bilerp(...verts,u0,v1)
+          ].map(v => project(v, layer));
+
+          const strength = Math.min(0.24, 0.055 + val*0.04 + layer*0.015);
+          ctx.fillStyle=cubeColor(faceIndex+val,layer,strength);
+          polyPath(cell);
+          ctx.fill();
+        }
+      }
+    }
+    ctx.restore();
+
+    // Face edge
+    ctx.save();
+    ctx.strokeStyle=cubeColor(faceIndex,layer,Math.min(.78,.40*alpha+.18));
+    ctx.lineWidth=Math.max(1.2,2.2*alpha);
+    polyPath(projected);
+    ctx.stroke();
+    ctx.restore();
+
+    // Recursive thirds
+    const divs=[1/3,2/3];
+    ctx.save();
+    ctx.strokeStyle=cubeColor(faceIndex+1,layer,0.20*alpha);
+    ctx.lineWidth=1;
+    divs.forEach(t=>{
+      let a=project(bilerp(...verts,t,0), layer), b=project(bilerp(...verts,t,1), layer);
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      a=project(bilerp(...verts,0,t), layer); b=project(bilerp(...verts,1,t), layer);
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    });
+    ctx.restore();
+
+    hitRegions.push({poly:projected,face,verts,layer,scale,avgz:obj.avgz});
+  });
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  hitRegions=[];
+  const depth=Number(depthSlider.value);
+  const density=Number(densitySlider.value);
+  const outerAlpha=depth===0?1:Math.max(.18,1-depth*.17);
+
+  // outer and recursive internal cubes
+  drawCubeLayer(1,0,outerAlpha,density);
+  if(depth>0) {
+    for(let i=1;i<=depth;i++) {
+      const s=Math.pow(.58,i);
+      drawCubeLayer(s,i,0.85,density+Math.min(i,2));
+    }
+  }
+
+  // point-up accent
+  const pts=[
+    project([-1,-1,-1],0),project([1,-1,-1],0),project([-1,1,-1],0),project([1,1,-1],0),
+    project([-1,-1,1],0),project([1,-1,1],0),project([-1,1,1],0),project([1,1,1],0)
+  ];
+  const top=pts.reduce((a,b)=>a.y<b.y?a:b);
+  ctx.save();
+  ctx.fillStyle='#d4a72c';ctx.strokeStyle='#fff';ctx.lineWidth=3;
+  ctx.beginPath();ctx.arc(top.x,top.y,7,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.restore();
+}
+
+function nearestLocalUV(region,x,y) {
+  // approximate inverse bilinear by coarse-to-fine search; robust enough for clicking.
+  let best={u:.5,v:.5,d:Infinity};
+  let centerU=.5,centerV=.5,span=.55;
+  for(let pass=0;pass<4;pass++) {
+    for(let iy=0;iy<=12;iy++) for(let ix=0;ix<=12;ix++) {
+      const u=Math.max(0,Math.min(1,centerU-span/2+span*ix/12));
+      const v=Math.max(0,Math.min(1,centerV-span/2+span*iy/12));
+      const p=project(bilerp(...region.verts,u,v), region.layer);
+      const d=(p.x-x)**2+(p.y-y)**2;
+      if(d<best.d) best={u,v,d};
+    }
+    centerU=best.u;centerV=best.v;span/=4;
+  }
+  return best;
+}
+
+function handleClick(x,y) {
+  const candidates=hitRegions.filter(r=>pointInPoly(x,y,r.poly)).sort((a,b)=>b.layer-a.layer || b.avgz-a.avgz);
+  if(!candidates.length) return;
+  const region=candidates[0];
+  const uv=nearestLocalUV(region,x,y);
+  const mapped=region.face.map(uv.u,uv.v);
+  const r=Math.min(subjects.length-1,Math.floor(mapped[0]*subjects.length));
+  const c=Math.min(subjects.length-1,Math.floor(mapped[1]*subjects.length));
+  const depthIndex=Math.min(subjects.length-1,Math.floor((region.layer/Math.max(1,Number(depthSlider.max)))*(subjects.length-1)));
+  showSelection(r,c,depthIndex,region.layer===0?'Cube surface':'Cube interior');
+}
+
+canvas.addEventListener('pointerdown',e=>{
+  dragging=true;moved=false;lastX=e.clientX;lastY=e.clientY;canvas.classList.add('dragging');canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!dragging)return;
+  const dx=e.clientX-lastX,dy=e.clientY-lastY;
+  if(Math.abs(dx)+Math.abs(dy)>3)moved=true;
+  rotY+=dx*.007;rotX+=dy*.007;lastX=e.clientX;lastY=e.clientY;draw();
+});
+canvas.addEventListener('pointerup',e=>{
+  if(!dragging)return;dragging=false;canvas.classList.remove('dragging');
+  if(!moved){
+    const rect=canvas.getBoundingClientRect();
+    handleClick((e.clientX-rect.left)*canvas.width/rect.width,(e.clientY-rect.top)*canvas.height/rect.height);
+  }
+});
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault(); zoom*=Math.exp(-e.deltaY*.001); zoom=Math.max(.50,Math.min(1.85,zoom)); draw();
+},{passive:false});
+
+depthSlider.addEventListener('input',()=>{
+  const labels=['Surface','Shallow','Middle','Deep','Core'];
+  depthLabel.textContent=labels[Number(depthSlider.value)];
+  draw();
+});
+densitySlider.addEventListener('input',()=>{densityLabel.textContent=densitySlider.value;draw();});
+
+document.getElementById('resetView').addEventListener('click',()=>{rotX=-.62;rotY=.78;rotZ=0;zoom=.78;spinPhase=0;draw();});
+document.getElementById('randomPoint').addEventListener('click',()=>{
+  const r=Math.floor(Math.random()*subjects.length),c=Math.floor(Math.random()*subjects.length),d=Math.floor(Math.random()*subjects.length);
+  showSelection(r,c,d,'Random point');
+});
+
+function updateSpinSpeedLabel() {
+  const v=Number(spinSpeed.value);
+  let label='Stopped';
+  if(v>0 && v<20) label='Very slow';
+  else if(v<45) label='Slow';
+  else if(v<70) label='Medium';
+  else if(v<90) label='Fast';
+  else if(v>=90) label='Very fast';
+  spinSpeedLabel.textContent=label;
+}
+spinSpeed.addEventListener('input',()=>{
+  updateSpinSpeedLabel();
+  if(Number(spinSpeed.value)===0 && spin) {
+    spin=false;
+    document.getElementById('toggleSpin').textContent='Start rotation';
+    if(raf) cancelAnimationFrame(raf);
+  } else if(Number(spinSpeed.value)>0 && !spin) {
+    spin=true;
+    document.getElementById('toggleSpin').textContent='Pause rotation';
+    animate();
+  }
+});
+
+document.getElementById('toggleSpin').addEventListener('click',e=>{
+  spin=!spin;
+  e.currentTarget.textContent=spin?'Pause rotation':'Start rotation';
+  if(spin) {
+    if(Number(spinSpeed.value)===0) spinSpeed.value='28';
+    updateSpinSpeedLabel();
+    animate();
+  } else if(raf) {
+    cancelAnimationFrame(raf);
+  }
+});
+
+function animate() {
+  if(!spin)return;
+  const speed=Number(spinSpeed.value)/100;
+  rotY += 0.0008 + speed*0.0085;
+  rotX += speed*0.00035;
+  spinPhase += 0.002 + speed*0.018;
+  draw();
+  raf=requestAnimationFrame(animate);
+}
+
+document.getElementById('buildBtn').addEventListener('click',()=>{
+  const next=normalizeSubjects(textarea.value);
+  if(next.length<2){alert('Please enter at least two subjects.');return;}
+  subjects=next;buildMatrix();buildMatrix2D();draw();
+});
+document.getElementById('defaultsBtn').addEventListener('click',()=>{
+  subjects=DEFAULT_SUBJECTS.slice();
+document.getElementById('toggleCounterRotation').addEventListener('click',e=>{
+  counterRotate = !counterRotate;
+  e.currentTarget.textContent = counterRotate ? 'Counter-rotation: On' : 'Counter-rotation: Off';
+  draw();
+});
+
+
+function setMode(mode) {
+  const is3D = mode === '3d';
+  mode3DSection.hidden = !is3D;
+  mode2DSection.hidden = is3D;
+
+  mode3D.classList.toggle('active',is3D);
+  mode2D.classList.toggle('active',!is3D);
+  mode3D.setAttribute('aria-pressed',String(is3D));
+  mode2D.setAttribute('aria-pressed',String(!is3D));
+
+  if(is3D) draw();
+}
+
+mode3D.addEventListener('click',()=>setMode('3d'));
+mode2D.addEventListener('click',()=>setMode('2d'));
+
+textarea.value=subjects.join('\n');buildMatrix();draw();
+});
+
+zSliceSelect.addEventListener('change',()=>buildMatrix());
+document.getElementById('prevZ').addEventListener('click',()=>{
+  if(!subjects.length) return;
+  const i=(Number(zSliceSelect.value)-1+subjects.length)%subjects.length;
+  zSliceSelect.value=String(i);
+  buildMatrix();
+});
+document.getElementById('nextZ').addEventListener('click',()=>{
+  if(!subjects.length) return;
+  const i=(Number(zSliceSelect.value)+1)%subjects.length;
+  zSliceSelect.value=String(i);
+  buildMatrix();
+});
+
+
+document.getElementById('toggleCounterRotation').addEventListener('click',e=>{
+  counterRotate = !counterRotate;
+  e.currentTarget.textContent = counterRotate ? 'Counter-rotation: On' : 'Counter-rotation: Off';
+  draw();
+});
+
+
+function setMode(mode) {
+  const is3D = mode === '3d';
+  mode3DSection.hidden = !is3D;
+  mode2DSection.hidden = is3D;
+
+  mode3D.classList.toggle('active',is3D);
+  mode2D.classList.toggle('active',!is3D);
+  mode3D.setAttribute('aria-pressed',String(is3D));
+  mode2D.setAttribute('aria-pressed',String(!is3D));
+
+  if(is3D) draw();
+}
+
+mode3D.addEventListener('click',()=>setMode('3d'));
+mode2D.addEventListener('click',()=>setMode('2d'));
+
+textarea.value=subjects.join('\n');
+buildMatrix();
+buildMatrix2D();
+setMode('3d');
+updateSpinSpeedLabel();
+draw();
+animate();
+})();
+</script>
+</body>
+</html>

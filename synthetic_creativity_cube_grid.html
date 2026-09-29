@@ -20,6 +20,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-se
 .mode-switch button{background:transparent;color:var(--ink);padding:9px 14px;border-radius:9px}
 .mode-switch button.active{background:var(--dark);color:#fff}
 .mode-section[hidden]{display:none!important}
+.about-panel{max-width:900px;padding:clamp(20px,4vw,40px);font-size:17px;line-height:1.75}
+.about-panel p{margin:0 0 1.2em}
+.about-panel p:last-child{margin-bottom:0}
 
 .hero{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,.65fr);gap:18px;align-items:start}
 h1{margin:0 0 8px;font-size:clamp(34px,5vw,62px);letter-spacing:-.045em;line-height:.98}
@@ -99,6 +102,7 @@ td.diag{background:#fff7d6;font-weight:700}
   <div class="mode-switch" role="group" aria-label="Visualization mode">
     <button type="button" id="mode3D" class="active" aria-pressed="true">3D Cube</button>
     <button type="button" id="mode2D" aria-pressed="false">2D Matrix</button>
+    <button type="button" id="modeAbout" aria-pressed="false">About</button>
   </div>
 
   <div id="mode3DSection" class="mode-section">
@@ -207,7 +211,17 @@ td.diag{background:#fff7d6;font-weight:700}
     </div>
   </div>
 
-  <section class="reading">
+  <section id="modeAboutSection" class="mode-section panel about-panel" aria-label="About Synthetic Creativity" hidden>
+    <p><strong>Synthetic Creativity</strong> is an experimental platform for generating new ideas by systematically combining fields of knowledge, methods, concepts, and ways of thinking. At its core is a simple premise: creativity often emerges when ideas that normally remain separate are brought into contact. Rather than waiting for those connections to happen by chance, Synthetic Creativity turns that process into something that can be explored deliberately.</p>
+    <p>The project begins with academic disciplines. Anthropology, architecture, linguistics, game studies, medicine, philosophy, data science, design, music, and dozens of other fields become elements in a structured possibility space. In the two-dimensional <strong>Synthetic Creativity Matrix</strong>, one discipline is crossed with another to generate questions, methods, and potential projects. What happens when anthropological methods are applied to robotics? How might architecture reshape questions in linguistics? What new field might emerge at the intersection of religious studies and data science?</p>
+    <p>The three-dimensional <strong>Synthetic Creativity Cube</strong> expands this logic further. Instead of combining two fields, it combines three. Each discipline can play a different role: one may provide a method, another a domain of inquiry, and a third a context, constraint, audience, or ethical complication. A single point in the cube might therefore generate a prompt such as: <em>Design a project in which Anthropology provides the method, Game Studies provides the domain, and Architecture provides the context, audience, or ethical complication.</em></p>
+    <p>With fifty disciplines, the cube contains <strong>125,000 ordered three-way combinations</strong>. The purpose is not to suggest that every combination will be equally useful. The point is to make the space of possibilities visible and navigable. Unexpected combinations can reveal questions that no single discipline would naturally formulate on its own.</p>
+    <p>The project draws on a long intellectual tradition. Fritz Zwicky’s morphological analysis explored the systematic enumeration of possible combinations. Arthur Koestler described creativity as <strong>bisociation</strong>, the meeting of previously separate matrices of thought. Margaret Boden has written about <strong>combinational creativity</strong>, while Gilles Fauconnier and Mark Turner’s theory of <strong>conceptual blending</strong> examines how new meanings emerge when conceptual spaces are brought together. Synthetic Creativity turns these ideas into interactive tools.</p>
+    <p>The matrix and cube are only the beginning. Future tools could combine disciplines with technologies, historical periods, geographic regions, populations, media forms, ethical frameworks, or research methods. A four-dimensional version could become a true creativity <strong>hypercube</strong>, while randomized or AI-assisted systems could explore increasingly complex conceptual spaces.</p>
+    <p>Synthetic Creativity is therefore less a single application than a framework for structured intellectual experimentation. It treats creativity not as a mysterious flash of inspiration, but as something that can also be cultivated through recombination, juxtaposition, exploration, and play.</p>
+  </section>
+
+  <section class="reading" id="furtherReading">
     <h2>Further Reading</h2>
     <p class="intro">A short genealogy of ideas behind combinational, synthetic, morphological, and interdisciplinary creativity.</p>
     <ol>
@@ -236,6 +250,9 @@ const mode3D = document.getElementById('mode3D');
 const mode2D = document.getElementById('mode2D');
 const mode3DSection = document.getElementById('mode3DSection');
 const mode2DSection = document.getElementById('mode2DSection');
+const modeAbout = document.getElementById('modeAbout');
+const modeAboutSection = document.getElementById('modeAboutSection');
+const furtherReading = document.getElementById('furtherReading');
 const count = document.getElementById('count');
 const result = document.getElementById('result');
 const zSliceSelect = document.getElementById('zSliceSelect');
@@ -731,30 +748,8 @@ document.getElementById('buildBtn').addEventListener('click',()=>{
 });
 document.getElementById('defaultsBtn').addEventListener('click',()=>{
   subjects=DEFAULT_SUBJECTS.slice();
-document.getElementById('toggleCounterRotation').addEventListener('click',e=>{
-  counterRotate = !counterRotate;
-  e.currentTarget.textContent = counterRotate ? 'Counter-rotation: On' : 'Counter-rotation: Off';
-  draw();
-});
-
-
-function setMode(mode) {
-  const is3D = mode === '3d';
-  mode3DSection.hidden = !is3D;
-  mode2DSection.hidden = is3D;
-
-  mode3D.classList.toggle('active',is3D);
-  mode2D.classList.toggle('active',!is3D);
-  mode3D.setAttribute('aria-pressed',String(is3D));
-  mode2D.setAttribute('aria-pressed',String(!is3D));
-
-  if(is3D) draw();
-}
-
-mode3D.addEventListener('click',()=>setMode('3d'));
-mode2D.addEventListener('click',()=>setMode('2d'));
-
-textarea.value=subjects.join('\n');buildMatrix();draw();
+  textarea.value=subjects.join('\n');
+  buildMatrix();buildMatrix2D();draw();
 });
 
 zSliceSelect.addEventListener('change',()=>buildMatrix());
@@ -780,20 +775,24 @@ document.getElementById('toggleCounterRotation').addEventListener('click',e=>{
 
 
 function setMode(mode) {
-  const is3D = mode === '3d';
-  mode3DSection.hidden = !is3D;
-  mode2DSection.hidden = is3D;
-
-  mode3D.classList.toggle('active',is3D);
-  mode2D.classList.toggle('active',!is3D);
-  mode3D.setAttribute('aria-pressed',String(is3D));
-  mode2D.setAttribute('aria-pressed',String(!is3D));
-
-  if(is3D) draw();
+  for(const [name, button, section] of [
+    ['3d', mode3D, mode3DSection],
+    ['2d', mode2D, mode2DSection],
+    ['about', modeAbout, modeAboutSection]
+  ]) {
+    const active = mode === name;
+    section.hidden = !active;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+    button.setAttribute('aria-controls',section.id);
+  }
+  furtherReading.hidden = mode === 'about';
+  if(mode === '3d') draw();
 }
 
 mode3D.addEventListener('click',()=>setMode('3d'));
 mode2D.addEventListener('click',()=>setMode('2d'));
+modeAbout.addEventListener('click',()=>setMode('about'));
 
 textarea.value=subjects.join('\n');
 buildMatrix();

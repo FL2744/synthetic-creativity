@@ -8,7 +8,7 @@
 
 Synthetic Creativity is an experimental platform for generating new ideas by systematically combining fields of knowledge, methods, concepts, and ways of thinking. It makes unexpected connections visible and navigable, turning recombination into a deliberate practice of exploration and play.
 
-Web implementation here: ['Synthetic Creativity'](https://l1001.vt.domains/synthetic_creativity_cube_grid.html)
+Web implementation here: [Synthetic Creativity](https://l1001.vt.domains/synthetic_creativity_cube_grid.html)
 
 ## Explore the matrix and cube
 

@@ -2,7 +2,11 @@
   <img src="synthetic-creativity-logo.png" alt="Synthetic Creativity — Ideas × Tools × Worlds" width="480">
 </p>
 
+<div align="left">
+
 Technical paper: [PDF](paper/Technical-Paper.pdf) · [LaTeX](paper/main.tex) · [Markdown](paper/TECHNICAL_PAPER.md) · [Source bundle](paper/Technical-Paper-Source.zip)
+
+</div>
 
 
 # Synthetic Creativity

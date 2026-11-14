@@ -24,11 +24,11 @@ Synthetic Creativity is a self-contained browser application for exploring inter
 \end{abstract}
 \keywords{combinatorial creativity, interdisciplinary ideation, visual exploration, browser applications}
 \maketitle
-\section{Motivation and intellectual context}
+\section{Purpose and Research Context}
 
-An interdisciplinary idea can begin by assigning different roles to familiar fields: one supplies a method, another a problem domain, and a third a context or constraint. Synthetic Creativity makes this assignment explicit and repeatable. It offers candidate questions for interpretation rather than presenting generated combinations as validated discoveries.
+Synthetic Creativity offers an interactive way to explore interdisciplinary questions by assigning different roles to familiar fields: one provides a method, another a problem domain, and a third a context or constraint. The application makes that assignment explicit and repeatable through an ordered discipline matrix and cube. Its purpose is to provide candidates for interpretation and development, with the usefulness and validity of a combination left to the person exploring it.
 
-Boden distinguishes different mechanisms of creativity, including the recombination of familiar ideas \cite{boden}. Creative Cognition examines the cognitive processes that can support invention and discovery \cite{finke}. Rhoten, O'Connor, and Hackett consider integrative creativity and collaborative disciplinary work \cite{rhoten}. These perspectives motivate structured encounters across domains, but none establishes that enumerating combinations alone produces creative achievement. The application's contribution is an inspectable interaction space; novelty, usefulness, feasibility, and disciplinary validity require subsequent judgment.
+This design connects combinatorial exploration to established accounts of creativity. Boden distinguishes mechanisms that include recombining familiar ideas \cite{boden}, Creative Cognition examines processes supporting invention \cite{finke}, and Mednick relates creativity to bringing ideas into new associations \cite{mednick}. The application turns such encounters into an inspectable interaction space, while treating the generation of a combination as the beginning of inquiry rather than evidence of creative achievement.
 
 \begin{figure}[!htb]
 % Balance the space above and below this figure and its caption.
@@ -41,13 +41,11 @@ Boden distinguishes different mechanisms of creativity, including the recombinat
 \vspace*{-8pt}
 \end{figure}
 
-\subsection{Research context}
+The ordered roles matter because a useful interdisciplinary connection involves more than substituting discipline names. Gentner's structure-mapping theory emphasizes correspondences between relations \cite{gentner}, and research on analogical encoding examines learning through comparison \cite{analogical}. Rhoten, O'Connor, and Hackett similarly consider integrative creativity in collaborative disciplinary work \cite{rhoten}. These perspectives motivate prompts that invite users to explain what transfers between domains and where an analogy fails, rather than assuming that any juxtaposition yields a sound question.
 
-Mednick's associative account links creativity to bringing ideas into new combinations \cite{mednick}. Gentner's structure-mapping theory emphasizes correspondences between relations \cite{gentner}, and research on analogical encoding examines learning through comparison \cite{analogical}. These perspectives make the roles assigned by a prompt important: substituting discipline names can invite an analogy, but does not itself construct a valid relational mapping. Users still need to explain what transfers between domains and where the comparison fails.
+The interface's spatial organization must be interpreted with the same care. Research on scientific impact associates influential work with combinations of conventional and atypical knowledge \cite{uzzi}, while design research examines whether conceptually distant inspiration produces better ideas \cite{chan}. Neither warrants a rule that more distant disciplines always produce more useful results. In this implementation, cube adjacency follows list order; its spatial distance is not a measured distance between concepts.
 
-Research on scientific impact associates influential work with combinations of conventional and atypical knowledge \cite{uzzi}. Design research also directly investigates whether conceptually distant inspiration produces better ideas \cite{chan}. Neither result licenses a simple rule that more distant disciplines must produce more useful questions. The cube's adjacency is determined by list order, so it is particularly important not to interpret its spatial distance as a measure of conceptual novelty.
-
-Shneiderman frames creativity-support tools around enabling exploration and discovery \cite{creativitytools}. This suggests evaluating the interface through the quality and diversity of ideas that people develop, rather than the count of enumerated cells. Doshi and Hauser's experiment on AI-assisted story writing distinguishes improvements in individual outputs from reduced collective diversity \cite{doshi}. Synthetic Creativity does not use an LLM, but the study supplies a useful evaluation distinction: a prompt system can help individual users while also channeling many users toward similar results.
+Shneiderman frames creativity-support tools around exploration and discovery \cite{creativitytools}, suggesting that evaluation should follow the ideas users develop rather than the number of available cells. Doshi and Hauser's AI-assisted writing experiment also distinguishes individual gains from reduced collective diversity \cite{doshi}. Although Synthetic Creativity uses deterministic prompts rather than an LLM, that distinction remains useful: an interface can help individuals while channeling many people toward similar outputs. The report accordingly describes the combinatorial model, prompt generation, navigation, and export mechanisms, while leaving novelty, feasibility, disciplinary validity, and diversity to subsequent human-centered evaluation.
 
 \section{Combinatorial model}
 

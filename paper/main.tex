@@ -55,11 +55,13 @@ The pair generator selects one of five templates by adding row and column indice
 
 Given an unchanged list and indices, the prompt is reproducible without a network call. Reordering the subject list changes both the mapping of names to positions and the template selector. Thus reproducibility requires preserving the ordered list as well as the selected coordinates. The generator contains no language model, semantic retrieval, novelty filter, or learned ranking function. Its variability comes from position and template selection.
 
-\begin{figure}[!htb]\centering
+\begin{figure}[!htb]\vspace*{8pt}
+\centering
 \includegraphics[width=.96\linewidth,height=.30\textheight,keepaspectratio]{figures/screenshot-02.png}
 \caption{The core cutaway exposes nested cubes while retaining the selected disciplinary prompt.}
 \Description{The core cutaway exposes nested cubes while retaining the selected disciplinary prompt.}
 \label{fig:2}
+\vspace*{-8pt}
 \end{figure}
 
 \section{Cube interaction and selection}
@@ -81,11 +83,13 @@ Users enter one subject per line. The application trims lines and removes case-i
 
 A Z slice fixes the third index and presents all n squared combinations of the remaining two indices as a table. Previous and next controls move through layers, and selecting a cell exposes its prompt. This is an alternative inspection surface for the same ordered triples, not a separate generative process. The cube emphasizes orientation and exploration, whereas the table permits systematic scanning and comparison.
 
-\begin{figure}[!htb]\centering
+\begin{figure}[!htb]\vspace*{4pt}
+\centering
 \includegraphics[width=.96\linewidth,height=.30\textheight,keepaspectratio]{figures/screenshot-04.png}
 \caption{A Z-slice view exposes ordered triples as a two-dimensional table and offers spreadsheet export.}
 \Description{A Z-slice view exposes ordered triples as a two-dimensional table and offers spreadsheet export.}
 \label{fig:4}
+\vspace*{-4pt}
 \end{figure}
 
 The separate two-dimensional mode operates on pairs. It has its own selected-cell question and matrix, and it uses the pair template rules rather than silently discarding the third role from a triple prompt. At the default list size, either table is already dense; zoom and viewport size affect legibility. Large custom lists therefore impose a practical usability limit even before computation becomes expensive.

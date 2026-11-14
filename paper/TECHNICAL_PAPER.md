@@ -109,3 +109,6 @@ This project was created with assistance from GPT-6 Astra and Codex. AI tools as
 
 10. Anil R. Doshi, Oliver P. Hauser (2024). [Generative AI enhances individual creativity but reduces the collective diversity of novel content](https://doi.org/10.1126/sciadv.adn5290). Science Advances. DOI: 10.1126/sciadv.adn5290.
 
+## Suggested Citation
+
+William Taggart. 2026. Synthetic Creativity: Navigating Ordered Combinations of Disciplines. Technical report. Modern and Classical Languages and Literatures, Virginia Tech. https://github.com/FL2744/synthetic-creativity

@@ -109,6 +109,7 @@ The three-dimensional export generates an XLSX workbook with one worksheet per Z
 \caption{The separate two-dimensional matrix generates pairwise prompts rather than three-way prompts.}
 \Description{The separate two-dimensional matrix generates pairwise prompts rather than three-way prompts.}
 \label{fig:5}
+\vspace*{-6pt}
 \end{figure}
 
 A visible slice needs work proportional to n squared, while full-cube export must enumerate n cubed prompts. Doubling the list length multiplies the conceptual cube and export workload by eight. These are asymptotic consequences of the implemented enumeration, not measured browser benchmarks. The application has no backend queue or external storage service to absorb that cost; large exports consume client memory and processing time.

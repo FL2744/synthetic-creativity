@@ -20,6 +20,14 @@ Boden distinguishes different mechanisms of creativity, including the recombinat
 
 *Figure 1. A selected ordered triple in the cube: Music, Cognitive Science, and Linguistics.*
 
+### Research context
+
+Mednick's associative account links creativity to bringing ideas into new combinations [The associative basis of the creative process.](https://doi.org/10.1037/h0048850). Gentner's structure-mapping theory emphasizes correspondences between relations [Structure‐Mapping: A Theoretical Framework for Analogy](https://doi.org/10.1207/s15516709cog0702_3), and research on analogical encoding examines learning through comparison [Learning and transfer: A general role for analogical encoding.](https://doi.org/10.1037/0022-0663.95.2.393). These perspectives make the roles assigned by a prompt important: substituting discipline names can invite an analogy, but does not itself construct a valid relational mapping. Users still need to explain what transfers between domains and where the comparison fails.
+
+Research on scientific impact associates influential work with combinations of conventional and atypical knowledge [Atypical Combinations and Scientific Impact](https://doi.org/10.1126/science.1240474). Design research also directly investigates whether conceptually distant inspiration produces better ideas [Do the best design ideas (really) come from conceptually distant sources of inspiration?](https://doi.org/10.1016/j.destud.2014.08.001). Neither result licenses a simple rule that more distant disciplines must produce more useful questions. The cube's adjacency is determined by list order, so it is particularly important not to interpret its spatial distance as a measure of conceptual novelty.
+
+Shneiderman frames creativity-support tools around enabling exploration and discovery [Creativity support tools: accelerating discovery and innovation](https://doi.org/10.1145/1323688.1323689). This suggests evaluating the interface through the quality and diversity of ideas that people develop, rather than the count of enumerated cells. Doshi and Hauser's experiment on AI-assisted story writing distinguishes improvements in individual outputs from reduced collective diversity [Generative AI enhances individual creativity but reduces the collective diversity of novel content](https://doi.org/10.1126/sciadv.adn5290). Synthetic Creativity does not use an LLM, but the study supplies a useful evaluation distinction: a prompt system can help individual users while also channeling many users toward similar results.
+
 ## Combinatorial model
 
 Let D be the ordered list of n subjects. The matrix indexes the Cartesian product D times D, and the cube indexes D times D times D. There are therefore n squared pair positions and n cubed triple positions, including combinations in which subjects repeat. With the default 50 disciplines, these counts are 2,500 and 125,000. They count ordered positions, not unique useful ideas.
@@ -89,4 +97,17 @@ This project was created with assistance from GPT-6 Astra and Codex. AI tools as
 2. Ronald A. Finke, Steven M. Smith, Thomas B. Ward (1992). [Creative Cognition: Theory, Research, and Applications](https://mitpress.mit.edu/9780262061506/creative-cognition/). MIT Press.
 
 3. Diana Rhoten, Erin O'Connor, Edward J. Hackett (2009). [The Act of Collaborative Creation and the Art of Integrative Creativity: Originality, Disciplinarity and Interdisciplinarity](https://doi.org/10.1177/0725513608099121). Thesis Eleven.
+4. Sarnoff Mednick (1962). [The associative basis of the creative process.](https://doi.org/10.1037/h0048850). Psychological Review. DOI: 10.1037/h0048850.
+
+5. Dedre Gentner (1983). [Structure‐Mapping: A Theoretical Framework for Analogy](https://doi.org/10.1207/s15516709cog0702_3). Cognitive Science. DOI: 10.1207/s15516709cog0702_3.
+
+6. Dedre Gentner, Jeffrey Loewenstein, Leigh Thompson (2003). [Learning and transfer: A general role for analogical encoding.](https://doi.org/10.1037/0022-0663.95.2.393). Journal of Educational Psychology. DOI: 10.1037/0022-0663.95.2.393.
+
+7. Brian Uzzi, Satyam Mukherjee, Michael Stringer, Ben Jones (2013). [Atypical Combinations and Scientific Impact](https://doi.org/10.1126/science.1240474). Science. DOI: 10.1126/science.1240474.
+
+8. Joel Chan, Steven P. Dow, Christian D. Schunn (2015). [Do the best design ideas (really) come from conceptually distant sources of inspiration?](https://doi.org/10.1016/j.destud.2014.08.001). Design Studies. DOI: 10.1016/j.destud.2014.08.001.
+
+9. Ben Shneiderman (2007). [Creativity support tools: accelerating discovery and innovation](https://doi.org/10.1145/1323688.1323689). Communications of the ACM. DOI: 10.1145/1323688.1323689.
+
+10. Anil R. Doshi, Oliver P. Hauser (2024). [Generative AI enhances individual creativity but reduces the collective diversity of novel content](https://doi.org/10.1126/sciadv.adn5290). Science Advances. DOI: 10.1126/sciadv.adn5290.
 
